@@ -29,7 +29,7 @@ class ModelConversation:
     def add_message(self, role: str, content: str):
         self.messages.append({"role": role, "content": content})
 
-    def send(self, message: str) -> str | None:
+    async def send(self, message: str,) -> str | None:
         """Send a new message"""
         self.add_message(role="user", content=message)
 
@@ -37,10 +37,9 @@ class ModelConversation:
         model = self.model.model_name
 
         try:
-            response = client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model=model,
                 messages=self.messages,
-                max_completion_tokens=200,
             )
             answer = response.choices[0].message.content
 

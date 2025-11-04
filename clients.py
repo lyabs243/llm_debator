@@ -1,8 +1,8 @@
 import os
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 class ModelClient:
-    def __init__(self, client: OpenAI):
+    def __init__(self, client: AsyncOpenAI):
         self.client = client
 
     @classmethod
@@ -23,7 +23,7 @@ class ModelClient:
         provider_configs = {
             'openai': {
                 'base_url': '',
-                'api_key_env': ''
+                'api_key_env': 'OPENAI_API_KEY'
             },
             'groq': {
                 'base_url': 'https://api.groq.com/openai/v1',
@@ -45,9 +45,9 @@ class ModelClient:
             raise ValueError(f"Environment variable {config['api_key_env']} not found")
 
         if provider == 'openai':
-            client = OpenAI()
+            client = AsyncOpenAI()
         else:
-            client = OpenAI(
+            client = AsyncOpenAI(
                 api_key=api_key,
                 base_url=config['base_url']
             )
