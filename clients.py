@@ -6,7 +6,7 @@ class ModelClient:
         self.client = client
 
     @classmethod
-    def from_provider(cls, provider: str) -> ModelClient:
+    def from_provider(cls, provider: str) -> 'ModelClient':
         """
         Create a ModelClient instance from a provider key.
 

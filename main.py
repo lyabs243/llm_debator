@@ -1,5 +1,7 @@
 # Complete debate interface
 import gradio as gr
+from model_conversation import Model
+from model_debator import MessageTone
 
 def start_debate(topic, initial_message, turns, show_logs, first_model, first_position, first_tone, second_model, second_position, second_tone):
     return f"Debate started on: {topic}\nInitial message: {initial_message}\nTurns: {turns}"
@@ -32,28 +34,28 @@ with gr.Blocks(title="LLM Debator - Full Interface") as debate_demo:
             
             gr.Markdown("### First Debater")
             first_model = gr.Dropdown(
-                choices=["GPT-4", "Claude", "Gemini", "Llama"],
+                choices=[model.model_name for model in Model],
                 label="Model",
-                value="GPT-4"
+                value=Model.GPT_4_1.model_name
             )
             first_position = gr.Textbox(label="Position", placeholder="First debater's position")
             first_tone = gr.Dropdown(
-                choices=["Formal", "Casual", "Academic", "Persuasive"],
+                choices=[tone.title for tone in MessageTone],
                 label="Tone",
-                value="Formal"
+                value=MessageTone.FORMAL.title
             )
             
             gr.Markdown("### Second Debater")
             second_model = gr.Dropdown(
-                choices=["GPT-4", "Claude", "Gemini", "Llama"],
+                choices=[model.model_name for model in Model],
                 label="Model",
-                value="Claude"
+                value=Model.GEMINI_2_5_FLASH.model_name
             )
             second_position = gr.Textbox(label="Position", placeholder="Second debater's position")
             second_tone = gr.Dropdown(
-                choices=["Formal", "Casual", "Academic", "Persuasive"],
+                choices=[tone.title for tone in MessageTone],
                 label="Tone",
-                value="Formal"
+                value=MessageTone.FORMAL.title
             )
         
         # Right panel - Chat
