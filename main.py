@@ -1,10 +1,98 @@
 # Complete debate interface
 import gradio as gr
+from dotenv import load_dotenv
 from model_conversation import Model
-from model_debator import MessageTone
+from model_debator import MessageTone, ModelDebator
+from model_debate import ModelDebate
 
-def start_debate(topic, initial_message, turns, show_logs, first_model, first_position, first_tone, second_model, second_position, second_tone):
-    return f"Debate started on: {topic}\nInitial message: {initial_message}\nTurns: {turns}"
+load_dotenv(override=True)
+
+# Store debate state
+current_debate = None
+debate_config = {}
+
+async def start_debate(topic, initial_message, turns, show_logs, first_model, first_position, first_tone, second_model, second_position, second_tone, history):
+    global current_debate, debate_config
+    
+    try:
+        # Ensure history is not None
+        if history is None:
+            history = []
+            
+        # Check if we're starting a new debate or continuing
+        new_config = {
+            'topic': topic,
+            'first_model': first_model,
+            'first_position': first_position,
+            'first_tone': first_tone,
+            'second_model': second_model,
+            'second_position': second_position,
+            'second_tone': second_tone
+        }
+        
+        # If config changed or no debate exists, start new
+        if current_debate is None or debate_config != new_config:
+            debate_config = new_config
+            
+            # Get enums from strings
+            first_model_enum = next(model for model in Model if model.model_name == first_model)
+            first_tone_enum = next(tone for tone in MessageTone if tone.title == first_tone)
+            second_model_enum = next(model for model in Model if model.model_name == second_model)
+            second_tone_enum = next(tone for tone in MessageTone if tone.title == second_tone)
+            
+            # Create debators
+            first_debator = ModelDebator(model=first_model_enum, debate_for=first_position, tone=first_tone_enum)
+            second_debator = ModelDebator(model=second_model_enum, debate_for=second_position, tone=second_tone_enum)
+            
+            # Create debate
+            current_debate = ModelDebate(
+                debator_a=first_debator,
+                debator_b=second_debator,
+                topic=topic,
+                turns=turns,
+                initial_message=initial_message,
+                log=show_logs
+            )
+            
+            # Run debate and get history
+            history = await current_debate.debate()
+        else:
+            # Continue the debate for additional turns
+            current_debate.turns = turns
+            # Check if history is empty or incomplete after reset
+            if not history or len(history) == 0:
+                # Restart the debate if history is empty
+                history = await current_debate.debate()
+            else:
+                # Get the last message from history to continue
+                last_message = history[-1][1] if len(history) > 0 and history[-1][1] is not None else current_debate.initial_message
+                
+                # Get new messages
+                for _ in range(turns):
+                    response_a = await current_debate.debator_a.send_message(message=last_message)
+                    history.append((f"**{current_debate.debator_a.model.model_name}**: {response_a}", None))
+                    
+                    response_b = await current_debate.debator_b.send_message(message=response_a)
+                    history[-1] = (history[-1][0], f"**{current_debate.debator_b.model.model_name}**: {response_b}")
+                    
+                    # Update last_message for the next iteration
+                    last_message = response_b
+        
+        # Print logs to console if enabled
+        if show_logs and current_debate:
+            for log in current_debate.history:
+                print(log)
+        
+        return history
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return [("Error", f"An error occurred: {str(e)}.")]
+
+def reset_debate():
+    global current_debate, debate_config
+    current_debate = None
+    debate_config = {}
+    return []
 
 def chat_debate(message, history):
     history = history or []
@@ -64,13 +152,18 @@ with gr.Blocks(title="LLM Debator - Full Interface") as debate_demo:
             debate_chatbot = gr.Chatbot(height=650)
             
             with gr.Row():
-                start_btn = gr.Button("🚀 Start Debate", variant="primary", scale=2)
-                debate_clear = gr.ClearButton([debate_chatbot], value="Reset", scale=1)
+                start_btn = gr.Button("➕ Continue Debate", variant="primary", scale=2)
+                debate_clear = gr.Button("Reset", scale=1)
     
     # Events
     start_btn.click(
         start_debate,
-        inputs=[topic, initial_message, turns, show_logs, first_model, first_position, first_tone, second_model, second_position, second_tone],
+        inputs=[topic, initial_message, turns, show_logs, first_model, first_position, first_tone, second_model, second_position, second_tone, debate_chatbot],
+        outputs=debate_chatbot
+    )
+    
+    debate_clear.click(
+        reset_debate,
         outputs=debate_chatbot
     )
 

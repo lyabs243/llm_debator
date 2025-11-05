@@ -17,6 +17,8 @@ class ModelDebate:
         self.turns = turns
         self.initial_message = initial_message
         self.log = log
+        self.history = []
+        self.chat_history = []
         self.init_debaters()
 
     # init debaters messages
@@ -52,7 +54,7 @@ class ModelDebate:
 
     def log_message(self, message:str):
         if self.log:
-            display(Markdown(message))
+            self.history.append(message)
 
     async def debate(self):
         self.log_message(f"========= {self.topic} =========")
@@ -61,15 +63,16 @@ class ModelDebate:
 
         self.log_message(f"Debater B: **{self.debator_b.model.model_name}** For: {self.debator_b.debate_for}\nTone: {self.debator_b.tone.title}\n")
 
-        response_a = self.initial_message
-        self.log_message(f"**{self.debator_a.model.model_name}**: {response_a}")
+        self.chat_history.append((f"**{self.debator_a.model.model_name}**: {self.initial_message}", None))
         response_b = await self.debator_b.send_message(message=self.initial_message,)
-        self.log_message(f"\n{self.debator_b.model.model_name}: {response_b}")
+        self.chat_history[-1] = (self.chat_history[-1][0], f"**{self.debator_b.model.model_name}**: {response_b}")
         
 
         for _ in range(self.turns):
             response_a = await self.debator_a.send_message(message=response_b,)
-            self.log_message(f"**{self.debator_a.model.model_name}**: {response_a}")
-
+            self.chat_history.append((f"**{self.debator_a.model.model_name}**: {response_a}", None))
+            
             response_b = await self.debator_b.send_message(message=response_a,)
-            self.log_message(f"\n**{self.debator_b.model.model_name}**: {response_b}")
+            self.chat_history[-1] = (self.chat_history[-1][0], f"**{self.debator_b.model.model_name}**: {response_b}")
+
+        return self.chat_history
