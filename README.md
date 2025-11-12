@@ -36,10 +36,13 @@ Use the model names exactly as shown in the dropdowns in the UI.
 
 ## Quick start
 
-1. Create and activate a virtual environment (cmd.exe):
+1. Create and activate a virtual environment:
+
+If you don't already have UV, [install it](https://pydevtools.com/handbook/how-to/how-to-install-uv/).
+Then, in the root of the project, execute the following commands:
 
 ```
-python -m venv venv
+uv venv
 venv\Scripts\activate
 ```
 
