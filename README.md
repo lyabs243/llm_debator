@@ -76,7 +76,7 @@ GROQ_API_KEY=...your-groq-key...
 4. Start the app:
 
 ```
-uvicorn main:app --host 0.0.0.0 --port 7860
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 Or run it directly with Python (uvicorn is launched programmatically):
@@ -85,7 +85,7 @@ Or run it directly with Python (uvicorn is launched programmatically):
 python main.py
 ```
 
-Then open `http://localhost:7860` in your browser.
+Then open `http://localhost:8000` in your browser.
 
 ## Provider setup (what you need to do per provider)
 
@@ -145,7 +145,7 @@ GROQ_API_KEY=...your-groq-key...
 
 ## Example usage
 
-1. Launch the app (`uvicorn main:app --port 7860` or `python main.py`).
+1. Launch the app (`uvicorn main:app --port 8000` or `python main.py`).
 2. Enter a topic and an opening message.
 3. Select the first and second model (from the dropdown), give each a position and tone, set the number of turns, and press "Continue Debate".
 4. The chat area will be populated with the debate back-and-forth. Use "Reset" to start fresh.

@@ -173,4 +173,4 @@ with gr.Blocks(title="LLM Debator - Full Interface") as debate_demo:
 app = gr.mount_gradio_app(fastapi.FastAPI(), debate_demo, path="/")
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=7860, reload=False)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
