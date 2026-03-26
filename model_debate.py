@@ -1,5 +1,4 @@
 from model_debator import ModelDebator
-from IPython.display import Markdown, display
 
 class ModelDebate:
     def __init__(

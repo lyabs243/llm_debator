@@ -22,7 +22,7 @@ Key ideas:
 - `model_debator.py`  Debator abstraction (tone, position) that uses the conversation wrapper.
 - `model_debate.py`  Orchestrates multi-turn debates between two `ModelDebator` instances.
 - `clients.py`  Provider client factory and configuration (environment variable names and base URLs are defined here).
-- `requirements.txt`  Python dependencies.
+- `pyproject.toml`  Project metadata and dependencies, managed with UV.
 
 ## Available model identifiers
 
@@ -41,15 +41,28 @@ Use the model names exactly as shown in the dropdowns in the UI.
 If you don't already have UV, [install it](https://pydevtools.com/handbook/how-to/how-to-install-uv/).
 Then, in the root of the project, execute the following commands:
 
+**Windows:**
 ```
 uv venv
-venv\Scripts\activate
+.venv\Scripts\activate
+```
+
+**Linux / macOS:**
+```
+uv venv
+source .venv/bin/activate
 ```
 
 2. Install dependencies:
 
 ```
-pip install -r requirements.txt
+uv sync
+```
+
+To also install the optional dev dependencies (notebooks):
+
+```
+uv sync --group dev
 ```
 
 3. Create a `.env` file in the project root (the app uses `python-dotenv` to load env vars). At minimum set the keys for whichever providers you plan to use. Example:
@@ -60,13 +73,19 @@ GEMINI_API_KEY=...your-gemini-key-or-token...
 GROQ_API_KEY=...your-groq-key...
 ```
 
-4. Start the Gradio app:
+4. Start the app:
+
+```
+uvicorn main:app --host 0.0.0.0 --port 7860
+```
+
+Or run it directly with Python (uvicorn is launched programmatically):
 
 ```
 python main.py
 ```
 
-The app will launch and open a browser tab with the UI.
+Then open `http://localhost:7860` in your browser.
 
 ## Provider setup (what you need to do per provider)
 
@@ -126,7 +145,7 @@ GROQ_API_KEY=...your-groq-key...
 
 ## Example usage
 
-1. Launch the app (`python main.py`).
+1. Launch the app (`uvicorn main:app --port 7860` or `python main.py`).
 2. Enter a topic and an opening message.
 3. Select the first and second model (from the dropdown), give each a position and tone, set the number of turns, and press "Continue Debate".
 4. The chat area will be populated with the debate back-and-forth. Use "Reset" to start fresh.

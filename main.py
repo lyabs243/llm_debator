@@ -1,5 +1,7 @@
 # Complete debate interface
+import fastapi
 import gradio as gr
+import uvicorn
 from dotenv import load_dotenv
 from model_conversation import Model
 from model_debator import MessageTone, ModelDebator
@@ -167,5 +169,7 @@ with gr.Blocks(title="LLM Debator - Full Interface") as debate_demo:
         outputs=debate_chatbot
     )
 
+app = gr.mount_gradio_app(fastapi.FastAPI(), debate_demo, path="/")
+
 if __name__ == "__main__":
-    debate_demo.launch(inbrowser=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=7860, reload=False)

@@ -1,0 +1,22 @@
+[project]
+name = "llm-debator"
+version = "0.1.0"
+description = "AI debate interface powered by multiple LLM providers"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "gradio>=5.0",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+    "uvicorn[standard]>=0.30",
+    "fastapi>=0.100",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.0",
+    "ipython>=8.0",
+]
+
+[tool.uv]
+package = false
