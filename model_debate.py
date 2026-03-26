@@ -62,16 +62,16 @@ class ModelDebate:
 
         self.log_message(f"Debater B: **{self.debator_b.model.model_name}** For: {self.debator_b.debate_for}\nTone: {self.debator_b.tone.title}\n")
 
-        self.chat_history.append((f"**{self.debator_a.model.model_name}**: {self.initial_message}", None))
+        self.chat_history.append({"role": "user", "content": f"**{self.debator_a.model.model_name}**: {self.initial_message}"})
         response_b = await self.debator_b.send_message(message=self.initial_message,)
-        self.chat_history[-1] = (self.chat_history[-1][0], f"**{self.debator_b.model.model_name}**: {response_b}")
+        self.chat_history.append({"role": "assistant", "content": f"**{self.debator_b.model.model_name}**: {response_b}"})
         
 
         for _ in range(self.turns):
             response_a = await self.debator_a.send_message(message=response_b,)
-            self.chat_history.append((f"**{self.debator_a.model.model_name}**: {response_a}", None))
+            self.chat_history.append({"role": "user", "content": f"**{self.debator_a.model.model_name}**: {response_a}"})
             
             response_b = await self.debator_b.send_message(message=response_a,)
-            self.chat_history[-1] = (self.chat_history[-1][0], f"**{self.debator_b.model.model_name}**: {response_b}")
+            self.chat_history.append({"role": "assistant", "content": f"**{self.debator_b.model.model_name}**: {response_b}"})
 
         return self.chat_history

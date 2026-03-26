@@ -67,15 +67,16 @@ async def start_debate(topic, initial_message, turns, show_logs, first_model, fi
                 history = await current_debate.debate()
             else:
                 # Get the last message from history to continue
-                last_message = history[-1][1] if len(history) > 0 and history[-1][1] is not None else current_debate.initial_message
+                last_msg_obj = history[-1] if len(history) > 0 else None
+                last_message = last_msg_obj["content"] if last_msg_obj and last_msg_obj.get("role") == "assistant" else current_debate.initial_message
                 
                 # Get new messages
                 for _ in range(turns):
                     response_a = await current_debate.debator_a.send_message(message=last_message)
-                    history.append((f"**{current_debate.debator_a.model.model_name}**: {response_a}", None))
+                    history.append({"role": "user", "content": f"**{current_debate.debator_a.model.model_name}**: {response_a}"})
                     
                     response_b = await current_debate.debator_b.send_message(message=response_a)
-                    history[-1] = (history[-1][0], f"**{current_debate.debator_b.model.model_name}**: {response_b}")
+                    history.append({"role": "assistant", "content": f"**{current_debate.debator_b.model.model_name}**: {response_b}"})
                     
                     # Update last_message for the next iteration
                     last_message = response_b
@@ -88,7 +89,7 @@ async def start_debate(topic, initial_message, turns, show_logs, first_model, fi
         return history
     except Exception as e:
         print(f"Error: {str(e)}")
-        return [("Error", f"An error occurred: {str(e)}.")]
+        return [{"role": "user", "content": "Error"}, {"role": "assistant", "content": f"An error occurred: {str(e)}."}]
 
 def reset_debate():
     global current_debate, debate_config
