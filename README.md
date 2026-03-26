@@ -1,5 +1,7 @@
 # LLM Debator
 
+[![Request a Live Demo](https://img.shields.io/badge/💬_Request_a_Live_Demo-Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/lyabs243)
+
 LLM Debator is an educational project to explore how different large language models behave and interact when orchestrated together. It was created to help learners and researchers experiment with combining LLMs from multiple providers (OpenAI, Google Gemini, Groq) and to compare their outputs in a controlled multi-turn debate setting.
 
 Key ideas:
